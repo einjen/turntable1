@@ -1,0 +1,107 @@
+thub#include <AccelStepper.h>
+
+// Define a stepper and the pins it will use
+AccelStepper stepper(AccelStepper::DRIVER, 6, 5);
+const int buttonPin1 = 2;     // the number of the pushbutton pin
+const int buttonPin2 = 3;
+const int buttonPin3 = 10;
+const int ledPin =  11;      // the number of the LED pin
+const int ledPin2 =  12;
+
+// variables will change:
+int buttonState1 = 0;
+int prevbuttonState1 = 0;
+int buttonState2 = 0;
+int prevbuttonState2 = 0;
+int runmotor1 = 0;
+int motorSpeed = 0;
+
+#define joyX A0
+#define joyY A1
+
+int xMap;
+int yMap;
+int xValue; 
+int yValue;
+
+int xyButton;
+
+unsigned long lastDebounceTime1 = 0;  // the last time the output pin was toggled
+unsigned long debounceDelay1 = 200;    // the debounce time; increase if the output flickers
+
+void setup()
+{  delay(2500);
+  Serial.begin(9600);
+  Serial.println("Hello");
+  stepper.setMaxSpeed(200);
+  stepper.setAcceleration(200);
+  stepper.setCurrentPosition(0);
+
+  
+    pinMode(ledPin, OUTPUT);
+    pinMode(ledPin2, OUTPUT);
+  // initialize the pushbutton pin as an input:
+  pinMode(buttonPin1, INPUT);
+  pinMode(buttonPin2, INPUT);
+  digitalWrite(ledPin2, HIGH);
+    digitalWrite(ledPin, HIGH);
+}
+
+
+
+void loop(){
+
+
+
+
+  if (stepper.distanceToGo() == 0)
+  {
+    stepper.moveTo(-stepper.currentPosition());
+    runmotor1 = 0;
+
+
+  }
+  
+  if (runmotor1 == 1 )
+    {
+}
+      stepper.setSpeed(motorSpeed);
+      stepper.runSpeedToPosition();
+    }
+  
+
+  buttonState1 = digitalRead(buttonPin1);
+  xValue = analogRead(joyX);
+  yValue = analogRead(joyY);
+    
+  if (prevbuttonState1 == 0) {
+    if (buttonState1 == HIGH) {
+      if ((millis() - lastDebounceTime1) > debounceDelay1) {
+        if (runmotor1 == 1) 
+        {
+          runmotor1 = 0;
+          digitalWrite(ledPin2, LOW);
+        } else
+        {
+          runmotor1 = 1;
+          if (xValue < 256 ) {
+            motorSpeed = 0;
+          }
+          digitalWrite(ledPin2, HIGH);
+        }
+      lastDebounceTime1 = millis();
+      prevbuttonState1 = 1;
+      }
+  
+    }
+  }
+  else
+  { prevbuttonState1 = 0;} 
+
+}
+
+void printStatus() {
+        if ((millis() - lastDebounceTime1) > debounceDelay1) {
+        Serial.println(xValue);
+      
+        }
